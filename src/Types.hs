@@ -15,7 +15,7 @@ data SessionState = SessionState {
   mailRcpt :: String,
   mailData :: String,
   step :: SMTPStep
-} deriving (Show, Eq)
+} deriving (Show, Read, Eq)
 
 data Mail = Mail {
   from ::  String,
@@ -25,7 +25,7 @@ data Mail = Mail {
   -- cco?
   content :: String,
   sentTime :: Int
-} deriving (Show)
+} deriving (Show, Read)
 
 -- Functional State Machine
 -- IO lets us have side effects (actions)

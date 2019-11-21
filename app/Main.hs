@@ -1,7 +1,7 @@
 module Main (main) where
 
 import Control.Concurrent (forkFinally, forkIO)
-import Control.Concurrent.Thread (wait)
+--import Control.Concurrent.Thread (wait)
 import qualified Control.Exception as E
 import Network.Socket
 import Control.Monad (unless, forever, void)
@@ -10,13 +10,13 @@ import POP.Server(popServer)
 
 main :: IO ()
 main = do 
-  smtpThreadId <- forkIO $ do 
-    runTCPServer Nothing "25" smtpServer
-    return ()
-  -- TODO: ver como correr los dos en paralelo y bloquear la ejecución hasta que ambos terminen
-  popThreadId <- forkIO $ do 
-    runTCPServer Nothing "100" popServer
-    return ()
+  runTCPServer Nothing "25" smtpServer
+  -- smtpThreadId <- forkIO $ do 
+  --   return ()
+  -- -- TODO: ver como correr los dos en paralelo y bloquear la ejecución hasta que ambos terminen
+  -- popThreadId <- forkIO $ do 
+  --   runTCPServer Nothing "100" popServer
+  --   return ()
   return ()
 
 -- TODO: entender mejor que hace esto

@@ -27,6 +27,7 @@ dependencies:
 - utf8-string
 - mtl
 - network
+- hedis
 
 library:
   source-dirs: src

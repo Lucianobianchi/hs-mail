@@ -10,7 +10,7 @@ import Control.Monad (unless, forever, void)
 import qualified Data.ByteString as S
 import Network.Socket
 import Network.Socket.ByteString (recv, sendAll)
-import Data.ByteString.UTF8 (toString)
+import Data.ByteString.UTF8 (toString, fromString)
 
 import SMTP.Parser
 import SMTP.StateMachine

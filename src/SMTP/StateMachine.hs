@@ -14,6 +14,7 @@ processCmd socket session cmd =
   case (step session, cmdName) of 
     (StandBy, Helo) -> do
       send socket "250 Hello, please to meet you"
+      -- saveMail Mail{from="lusho", to="nicky", content="hola nicky", sentTime=1234}
       return SessionState{step=Helo, mailRcpt="", mailFrom="", mailData=""}
   
     (Helo, MailFrom) -> do 
