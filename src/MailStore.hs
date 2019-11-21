@@ -6,22 +6,27 @@ import Database.Redis
 import Control.Monad.Trans
 import Data.ByteString.UTF8 (toString, fromString)
 
--- bueno anda todo bastante bien
--- TODO: usar show/read para serializar/deserializar el mail
--- guardar el mail en una lista de redis usando como key el destinatario del mail
--- Hacer la funcion get que devuelve la lista de mails
+readMail :: String -> Mail
+readMail mail = read mail
+
+-- TODO:
+-- handle para errores
 -- Parametrizar el connectInfo en vez de usar el default
--- Loggear?
 saveMail :: Mail -> IO ()
 saveMail mail = do 
   conn <- connect defaultConnectInfo
   runRedis conn $ do
-    liftIO $ print "Getting record"
-    liftIO $ print (readMailStr (show mail))
-    liftIO $ print (from (readMailStr (show mail)))
+    liftIO $ print $ "Saving email: " ++ show mail
+    rpush (fromString $ to mail) [fromString $ show mail]
+    return ()
 
-readMailStr :: String -> Mail
-readMailStr mailStr = read mailStr
-
-getMail :: String -> [Mail]
-getMail inbox = [Mail{from="lusho", to="nicky", content="hola nicky", sentTime=1234}, Mail{from="lusho", to="nicky", content="hola nicky", sentTime=1234}]
+-- TODO: medio raro el tipo de esto, no se como pasarle el handler
+getMails :: String -> ([Mail] -> Redis ()) -> IO () 
+getMails inbox handle = do
+  conn <- connect defaultConnectInfo
+  runRedis conn $ do
+    liftIO $ print $ "Retrieving emails for: " ++ inbox
+    result <- lrange (fromString $ inbox) 0 (-1) -- to get the whole list
+    case result of 
+      Right allmails -> handle (map (readMail.toString) allmails)
+      Left err -> liftIO $ print err

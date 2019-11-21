@@ -6,7 +6,9 @@ module Types
   Mail(Mail, from, to, content, sentTime)
 ) where 
 
-data SMTPStep = Helo | MailFrom | MailRcpt | DataStart | DataLine | StandBy | Exit deriving (Show, Eq)
+import Data.Time
+
+data SMTPStep = Helo | MailFrom | MailRcpt | DataStart | DataLine | StandBy | Exit deriving (Show, Read, Eq)
 
 type SMTPCommand = (SMTPStep, String)
 
@@ -24,7 +26,7 @@ data Mail = Mail {
   -- cc?
   -- cco?
   content :: String,
-  sentTime :: Int
+  sentTime :: UTCTime
 } deriving (Show, Read)
 
 -- Functional State Machine

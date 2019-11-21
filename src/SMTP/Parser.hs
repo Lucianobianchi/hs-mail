@@ -32,8 +32,8 @@ smtpLineParser session =
       argument <- manyTill anyChar newline
       return (DataLine, argument)
     DataLine -> do
-      argument <- (string "\n\r") <|> (manyTill anyChar newline) 
-      if argument == "\n\r" 
+      argument <- (string ".") <|> (manyTill anyChar newline) 
+      if argument == "." 
         then return (StandBy, argument)
         else return (DataLine, argument)
 

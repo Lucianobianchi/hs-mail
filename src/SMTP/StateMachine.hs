@@ -8,13 +8,19 @@ import MailStore
 import NetworkUtils(send)
 import Network.Socket
 
+import Data.Time.Clock
+
+saveMailInSession :: SessionState -> IO ()
+saveMailInSession s = do
+  now <- getCurrentTime
+  saveMail Mail{from=mailFrom s, to=mailRcpt s, content=mailData s, sentTime=now}
+
 processCmd :: Socket -> FSM SessionState SMTPCommand
 processCmd socket session cmd = 
   let (cmdName, arg) = cmd in
   case (step session, cmdName) of 
     (StandBy, Helo) -> do
       send socket "250 Hello, please to meet you"
-      -- saveMail Mail{from="lusho", to="nicky", content="hola nicky", sentTime=1234}
       return SessionState{step=Helo, mailRcpt="", mailFrom="", mailData=""}
   
     (Helo, MailFrom) -> do 
@@ -36,7 +42,8 @@ processCmd socket session cmd =
       return SessionState{step=DataLine, mailRcpt=mailRcpt session, mailFrom=mailFrom session, mailData=(mailData session) ++ "\n" ++ arg}
     
     (DataLine, StandBy) -> do
-      send socket "250 Ok"
+      send socket "250 Ok queued"
+      saveMailInSession session
       return SessionState{step=StandBy, mailRcpt="", mailFrom="", mailData=""}
     
     (StandBy, Exit) -> do
