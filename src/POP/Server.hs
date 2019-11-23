@@ -1,5 +1,5 @@
-module SMTP.Server 
-(smtpServer) where
+module POP.Server 
+(popServer) where
 
 import Text.ParserCombinators.Parsec
 import Text.ParserCombinators.Parsec.Error
@@ -12,25 +12,25 @@ import Network.Socket
 import Network.Socket.ByteString (recv, sendAll)
 import Data.ByteString.UTF8 (toString, fromString)
 
-import SMTP.Parser
-import SMTP.StateMachine
+import POP.Parser
+import POP.StateMachine
 import Types
-import SMTP.Types
+import POP.Types
 import NetworkUtils(send, sendMany)
   
-smtpServer socket = do
+popServer socket = do
   print "Starting server..."
-  execStateT (smtpProcessor socket) SMTPSessionState{mailFrom="", mailRcpt=[], mailData="", step=StandBy}
+  execStateT (popProcessor socket) POPSessionState{step=StandBy, user="", pass=""}
 
-smtpProcessor :: Socket -> StateT SMTPSessionState IO ()
-smtpProcessor socket = do 
+popProcessor :: Socket -> StateT POPSessionState IO ()
+popProcessor socket = do 
   msg <- lift $ recv socket 1024
 
   unless (S.null msg) $ do
     serverState <- get
     let message = toString msg
 
-    let parseResult = parse (smtpLineParser serverState) "" message
+    let parseResult = parse (popLineParser serverState) "" message
 
     case parseResult of 
       Left err -> do
@@ -38,10 +38,10 @@ smtpProcessor socket = do
         -- TODO: hacer esto bien y responder con los códigos de SMTP
         let errorResponse = map messageString (errorMessages err)
         lift $ sendMany socket errorResponse
-        smtpProcessor socket
+        popProcessor socket
 
       Right cmd -> do
         nextState <- lift $ processCmd socket serverState cmd 
         lift $ print nextState
         put nextState
-        unless (Exit == step nextState) (smtpProcessor socket)
+        unless (Exit == step nextState) (popProcessor socket)

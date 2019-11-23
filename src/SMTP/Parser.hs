@@ -1,6 +1,7 @@
 module SMTP.Parser  
 ( smtpLineParser ) where 
 import Types
+import SMTP.Types
 import Text.ParserCombinators.Parsec
 import Data.Char
 
@@ -18,7 +19,7 @@ addressLine cmdStr smtpStep = do
   argument <- (char '<') *> manyTill anyChar (char '>') <* newline
   return (smtpStep, argument)
 
-smtpLineParser :: SessionState -> Parser SMTPCommand
+smtpLineParser :: SMTPSessionState -> Parser SMTPCommand
 smtpLineParser session = 
   case (step session) of 
     StandBy -> cmdLine "HELO" Helo <|> cmdLine "QUIT" Exit

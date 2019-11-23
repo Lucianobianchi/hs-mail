@@ -6,17 +6,17 @@ import qualified Control.Exception as E
 import Network.Socket
 import Control.Monad (unless, forever, void)
 import SMTP.Server(smtpServer)
+import POP.Server(popServer)
 -- import POP.Server(popServer)
+
+-- main :: IO ()
+-- main = do 
+--   runTCPServer Nothing "25" smtpServer
+--   return ()
 
 main :: IO ()
 main = do 
-  runTCPServer Nothing "25" smtpServer
-  -- smtpThreadId <- forkIO $ do 
-  --   return ()
-  -- -- TODO: ver como correr los dos en paralelo y bloquear la ejecución hasta que ambos terminen
-  -- popThreadId <- forkIO $ do 
-  --   runTCPServer Nothing "100" popServer
-  --   return ()
+  runTCPServer Nothing "123" popServer -- TODO: ver puerto
   return ()
 
 -- TODO: entender mejor que hace esto
