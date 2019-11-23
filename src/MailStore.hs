@@ -17,7 +17,8 @@ saveMail mail = do
   conn <- connect defaultConnectInfo
   runRedis conn $ do
     liftIO $ print $ "Saving email: " ++ show mail
-    rpush (fromString $ to mail) [fromString $ show mail]
+    -- TODO: enviar a todos los recipients. Map?
+    rpush (fromString $ (to mail) !! 0) [fromString $ show mail]
     return ()
 
 -- TODO: medio raro el tipo de esto, no se como pasarle el handler

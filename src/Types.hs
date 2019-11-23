@@ -14,17 +14,14 @@ type SMTPCommand = (SMTPStep, String)
 
 data SessionState = SessionState { 
   mailFrom :: String, 
-  mailRcpt :: String,
+  mailRcpt :: [String],
   mailData :: String,
   step :: SMTPStep
 } deriving (Show, Read, Eq)
 
 data Mail = Mail {
   from ::  String,
-  to :: String,
-  -- TODO
-  -- cc?
-  -- cco?
+  to :: [String],
   content :: String,
   sentTime :: UTCTime
 } deriving (Show, Read)

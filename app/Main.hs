@@ -6,7 +6,7 @@ import qualified Control.Exception as E
 import Network.Socket
 import Control.Monad (unless, forever, void)
 import SMTP.Server(smtpServer)
-import POP.Server(popServer)
+-- import POP.Server(popServer)
 
 main :: IO ()
 main = do 

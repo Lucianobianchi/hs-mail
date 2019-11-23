@@ -19,7 +19,7 @@ import NetworkUtils(send, sendMany)
   
 smtpServer socket = do
   print "Starting server..."
-  execStateT (smtpProcessor socket) SessionState{mailFrom="", mailRcpt="", mailData="", step=StandBy}
+  execStateT (smtpProcessor socket) SessionState{mailFrom="", mailRcpt=[], mailData="", step=StandBy}
 
 smtpProcessor :: Socket -> StateT SessionState IO ()
 smtpProcessor socket = do 

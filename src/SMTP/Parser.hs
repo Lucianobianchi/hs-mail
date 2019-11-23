@@ -4,36 +4,33 @@ import Types
 import Text.ParserCombinators.Parsec
 import Data.Char
 
-toSMTPStep cmdStr =
-  case cmdStr of
-    "HELO" -> Helo
-    "MAIL FROM:" -> MailFrom
-    "RCPT TO:" -> MailRcpt
-    "DATA" -> DataStart
-
-cmdLineParser = \cmdStr -> do
+cmdLine :: String -> SMTPStep -> Parser SMTPCommand
+cmdLine cmdStr smtpStep = do
   cmd <- string cmdStr
   many (char ' ')
   argument <- manyTill anyChar newline
-  return (toSMTPStep cmd, argument)
+  return (smtpStep, argument)
 
-quitParser = do
-  string "QUIT"
-  return (Exit, "")
+addressLine:: String -> SMTPStep -> Parser SMTPCommand
+addressLine cmdStr smtpStep = do
+  cmd <- string cmdStr
+  many (char ' ')
+  argument <- (char '<') *> manyTill anyChar (char '>') <* newline
+  return (smtpStep, argument)
 
 smtpLineParser :: SessionState -> Parser SMTPCommand
 smtpLineParser session = 
   case (step session) of 
-    StandBy -> cmdLineParser "HELO" <|> quitParser
-    Helo -> cmdLineParser "MAIL FROM:"
-    MailFrom -> cmdLineParser "RCPT TO:"
-    MailRcpt -> cmdLineParser "DATA"
-    DataStart -> do
-      argument <- manyTill anyChar newline
-      return (DataLine, argument)
-    DataLine -> do
-      argument <- (string ".") <|> (manyTill anyChar newline) 
-      if argument == "." 
-        then return (StandBy, argument)
-        else return (DataLine, argument)
+    StandBy -> cmdLine "HELO" Helo <|> cmdLine "QUIT" Exit
+    Helo -> addressLine "MAIL FROM:" MailFrom
+    MailFrom -> mailRcpt
+    MailRcpt -> mailRcpt <|> cmdLine "DATA" DataStart
+    DataStart -> dataLine -- TODO: check if DATA is completely empty
+    DataLine -> cmdLine "." StandBy <|> dataLine
+    where
+      mailRcpt = addressLine "RCPT TO:" MailRcpt
+      mailFrom = addressLine "MAIL FROM:" MailFrom
+      dataLine = do 
+        arg <- manyTill anyChar newline
+        return (DataLine, arg)
 

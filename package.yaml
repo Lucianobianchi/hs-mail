@@ -29,6 +29,7 @@ dependencies:
 - network
 - hedis
 - time
+- email-validate
 
 library:
   source-dirs: src
