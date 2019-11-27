@@ -22,6 +22,7 @@ popServer socket = do
   print "Starting server..."
   execStateT (popProcessor socket) POPSessionState{step=StandBy, user="", pass=""}
 
+-- TODO: se podría compartir esta función entre SMTP y POP? Sin hacerlo muy confuso
 popProcessor :: Socket -> StateT POPSessionState IO ()
 popProcessor socket = do 
   msg <- lift $ recv socket 1024
@@ -35,7 +36,7 @@ popProcessor socket = do
     case parseResult of 
       Left err -> do
         lift $ print err
-        -- TODO: hacer esto bien y responder con los códigos de SMTP
+        -- TODO: hacer esto bien y responder con los códigos de POP
         let errorResponse = map messageString (errorMessages err)
         lift $ sendMany socket errorResponse
         popProcessor socket

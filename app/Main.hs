@@ -14,10 +14,7 @@ import POP.Server(popServer)
 --   runTCPServer Nothing "25" smtpServer
 --   return ()
 
-main :: IO ()
-main = do 
-  runTCPServer Nothing "123" popServer -- TODO: ver puerto
-  return ()
+main = runTCPServer Nothing "123" popServer -- TODO: ver puerto
 
 -- TODO: entender mejor que hace esto
 -- from the "network-run" package.

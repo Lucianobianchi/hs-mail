@@ -6,7 +6,6 @@ module Types
 
 import Data.Time
 
-
 data Mail = Mail {
   from ::  String,
   to :: [String],

@@ -1,5 +1,5 @@
 module MailStore 
-(saveMail) where 
+(saveMail, getMails, deleteMail) where 
 
 import Types
 import Database.Redis
@@ -21,13 +21,21 @@ saveMail mail = do
     rpush (fromString $ (to mail) !! 0) [fromString $ show mail]
     return ()
 
--- TODO: medio raro el tipo de esto, no se como pasarle el handler
-getMails :: String -> ([Mail] -> Redis ()) -> IO () 
+getMails :: String -> ([Mail] -> IO a) -> IO a
 getMails inbox handle = do
   conn <- connect defaultConnectInfo
   runRedis conn $ do
     liftIO $ print $ "Retrieving emails for: " ++ inbox
-    result <- lrange (fromString $ inbox) 0 (-1) -- to get the whole list
+    result <- lrange (fromString inbox) 0 (-1) -- to get the whole list
     case result of 
-      Right allmails -> handle (map (readMail.toString) allmails)
-      Left err -> liftIO $ print err
+      Right allmails -> liftIO $ handle (map (readMail.toString) allmails)
+      Left err -> liftIO $ handle []
+
+deleteMail :: String -> Integer -> IO ()
+deleteMail inbox index = do 
+  conn <- connect defaultConnectInfo
+  runRedis conn $ do
+    lset (fromString inbox) index (fromString "__DELETED__")
+    lrem (fromString inbox) 1 (fromString "__DELETED__")
+    liftIO $ print $ "Deleting email at inbox " ++ inbox ++ " index " ++ (show index)
+    return ()

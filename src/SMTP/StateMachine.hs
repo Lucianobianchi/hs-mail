@@ -31,9 +31,9 @@ noSuchUserError socket session arg = do
     
 processCmd :: Socket -> FSM SMTPSessionState SMTPCommand
 processCmd socket session cmd = 
-  let (cmdName, arg) = cmd 
+  let (nextStep, arg) = cmd 
   in
-  case (step session, cmdName) of 
+  case (step session, nextStep) of 
     (StandBy, Helo) -> do
       send socket "250 Hello, please to meet you"
       return SMTPSessionState{step=Helo, mailRcpt=[], mailFrom="", mailData=""}
