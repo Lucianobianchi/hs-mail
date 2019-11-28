@@ -26,7 +26,7 @@ smtpLineParser session =
     Helo -> addressLine "MAIL FROM:" MailFrom <|> exit
     MailFrom -> mailRcpt <|> exit
     MailRcpt -> mailRcpt <|> cmdLine "DATA" DataStart <|> exit
-    DataStart -> dataLine -- TODO: check if DATA is completely empty
+    DataStart -> dataLine
     DataLine -> cmdLine "." StandBy <|> dataLine
     where
       exit = cmdLine "QUIT" Exit

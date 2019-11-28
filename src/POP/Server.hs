@@ -18,9 +18,7 @@ import Types
 import POP.Types
 import NetworkUtils(send, sendMany)
   
-popServer socket = do
-  print "Starting server..."
-  execStateT (popProcessor socket) POPSessionState{step=StandBy, user="", pass=""}
+popServer socket = execStateT (popProcessor socket) POPSessionState{step=StandBy, user="", pass=""}
 
 -- TODO: se podría compartir esta función entre SMTP y POP? Sin hacerlo muy confuso
 popProcessor :: Socket -> StateT POPSessionState IO ()

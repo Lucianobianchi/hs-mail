@@ -2,7 +2,6 @@ module Main (main) where
 
 import Control.Concurrent (forkFinally, forkIO)
 import Control.Concurrent.MVar
---import Control.Concurrent.Thread (wait)
 import qualified Control.Exception as E
 import Network.Socket
 import Control.Monad (unless, forever, void)
