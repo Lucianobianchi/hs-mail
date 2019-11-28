@@ -19,16 +19,16 @@ processCmd socket session cmd =
       if (length arg) == 0
       then
         do 
-          send socket "Please specify a user"
+          send socket "-ERR Please specify a user"
           return session
       else
         do 
-          send socket "OK"
+          send socket "+OK"
           return POPSessionState{step=User, user=arg, pass=""}
     
     (User, Pass) -> do
       -- Any password is valid right now
-      send socket "OK"
+      send socket "+OK"
       return POPSessionState{step=LoggedIn, user=user session, pass=arg}
     
       -- TODO: estoy repitiendo codigo fuerte aca
@@ -59,12 +59,16 @@ processCmd socket session cmd =
       send socket $ "+OK deleted " ++ (show index)
       return session
 
+    (_, Reset) -> do
+      send socket "+OK reset session"
+      return POPSessionState{step=StandBy, user="", pass=""}
+
     (_, Exit) -> do
-      send socket "Ok bye!"
+      send socket "+OK bye!"
       return POPSessionState{step=Exit, user="", pass=""}
 
     (_, _) -> do
-      send socket "you must log in first!"
+      send socket "-ERR You must log in first!"
       return session
       
       -- TODO: devolver 0 cuando no hay ningun mail en STAT y LIST

@@ -35,9 +35,7 @@ smtpProcessor socket = do
     case parseResult of 
       Left err -> do
         lift $ print err
-        -- TODO: hacer esto bien y responder con los códigos de SMTP
-        let errorResponse = map messageString (errorMessages err)
-        lift $ sendMany socket errorResponse
+        lift $ send socket $ "501 Syntax error - unexpected command " ++ (init message)
         smtpProcessor socket
 
       Right cmd -> do

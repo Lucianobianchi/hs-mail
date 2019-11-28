@@ -1,12 +1,12 @@
 module POP.Types 
 (
   POPSessionState(POPSessionState, step, user, pass),
-  POPStep(User, Pass, LoggedIn, List, Stat, Retr, Dele, StandBy, Exit),
+  POPStep(User, Pass, LoggedIn, List, Stat, Retr, Dele, StandBy, Exit, Reset),
   POPCommand
 ) where 
 
 -- TODO: diferenciar entre step y command. No son lo mismo y se ve mas claro en POP
-data POPStep = User | Pass | LoggedIn | List | Stat | Retr | Dele | StandBy | Exit deriving (Show, Read, Eq)
+data POPStep = User | Pass | LoggedIn | List | Stat | Retr | Dele | StandBy | Exit | Reset deriving (Show, Read, Eq)
 
 type POPCommand = (POPStep, String)
 

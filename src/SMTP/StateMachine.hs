@@ -39,17 +39,17 @@ processCmd socket session cmd =
       return SMTPSessionState{step=Helo, mailRcpt=[], mailFrom="", mailData=""}
   
     (Helo, MailFrom) -> do
-      whenS (not (isValidEmail arg)) (noSuchUserError socket session arg) $ do
+      whenS (not $ isValidEmail arg) (noSuchUserError socket session arg) $ do
         send socket "250 Ok"
         return SMTPSessionState{step=MailFrom, mailRcpt=[], mailFrom=arg, mailData=""}
 
     (MailFrom, MailRcpt) -> do
-      whenS (not (isValidEmail arg)) (noSuchUserError socket session arg) $ do
+      whenS (not $ isValidEmail arg) (noSuchUserError socket session arg) $ do
         send socket "250 Ok"
         return SMTPSessionState{step=MailRcpt, mailRcpt=[arg], mailFrom=mailFrom session, mailData=""}
 
     (MailRcpt, MailRcpt) -> do
-      whenS (not (isValidEmail arg)) (noSuchUserError socket session arg) $ do
+      whenS (not $ isValidEmail arg) (noSuchUserError socket session arg) $ do
         send socket "250 Ok"
         return SMTPSessionState{step=MailRcpt, mailRcpt=(mailRcpt session) ++ [arg], mailFrom=mailFrom session, mailData=""}
   

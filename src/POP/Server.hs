@@ -36,9 +36,7 @@ popProcessor socket = do
     case parseResult of 
       Left err -> do
         lift $ print err
-        -- TODO: hacer esto bien y responder con los códigos de POP
-        let errorResponse = map messageString (errorMessages err)
-        lift $ sendMany socket errorResponse
+        lift $ send socket $ "-ERR Syntax error - unexpected command " ++ (init message)
         popProcessor socket
 
       Right cmd -> do
