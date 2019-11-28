@@ -30,13 +30,14 @@ popProcessor socket = do
   unless (S.null msg) $ do
     serverState <- get
     let message = toString msg
+    lift $ print message
 
     let parseResult = parse (popLineParser serverState) "" message
 
     case parseResult of 
       Left err -> do
         lift $ print err
-        lift $ send socket $ "-ERR Syntax error - unexpected command " ++ (init message)
+        lift $ send socket $ "-ERR Error - unexpected command " ++ (init message)
         popProcessor socket
 
       Right cmd -> do

@@ -3,6 +3,7 @@ module MailStore
 
 import Types
 import Database.Redis
+import Control.Monad
 import Control.Monad.Trans
 import Data.ByteString.UTF8 (toString, fromString)
 
@@ -17,8 +18,8 @@ saveMail mail = do
   conn <- connect defaultConnectInfo
   runRedis conn $ do
     liftIO $ print $ "Saving email: " ++ show mail
-    -- TODO: enviar a todos los recipients. Map?
-    rpush (fromString $ (to mail) !! 0) [fromString $ show mail]
+    forM (to mail) $ (\recipient -> do
+      rpush (fromString recipient) [fromString $ show mail])
     return ()
 
 getMails :: String -> ([Mail] -> IO a) -> IO a

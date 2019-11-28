@@ -21,5 +21,4 @@ getRetr mails index =
   in (show $ mailBytes mail) ++ " octets\n" ++ (content mail)
 
 getList :: [Mail] -> String
-getList mails = intercalate "\n" $ map (\m -> (show $ 1) ++ " " ++ (show $ mailBytes m)) mails
---TODO INDEX
+getList mails = intercalate "\n" $ map (\(m, i) -> (show $ i+1) ++ " " ++ (show $ mailBytes m)) (zip mails [0..])

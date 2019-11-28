@@ -11,10 +11,11 @@ import POP.Server(popServer)
 
 -- main :: IO ()
 -- main = do 
---   runTCPServer Nothing "25" smtpServer
+main = runTCPServer Nothing "25" smtpServer
 --   return ()
+-- TODO: manejar mensajes vacíos
 
-main = runTCPServer Nothing "123" popServer -- TODO: ver puerto
+-- main = runTCPServer Nothing "110" popServer -- TODO: ver puerto
 
 -- TODO: entender mejor que hace esto
 -- from the "network-run" package.

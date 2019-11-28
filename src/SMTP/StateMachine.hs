@@ -66,9 +66,9 @@ processCmd socket session cmd =
     (DataLine, StandBy) -> do
       send socket "250 Ok queued"
       saveMailInSession session
-      return SMTPSessionState{step=StandBy, mailRcpt=[], mailFrom="", mailData=""}
+      return SMTPSessionState{step=Helo, mailRcpt=[], mailFrom="", mailData=""}
     
-    (StandBy, Exit) -> do
+    (_, Exit) -> do
       send socket "Bye!"
       return SMTPSessionState{step=Exit, mailRcpt=[], mailFrom="", mailData=""}
     

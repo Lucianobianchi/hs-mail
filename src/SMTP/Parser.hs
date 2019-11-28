@@ -22,13 +22,14 @@ addressLine stepStr smtpStep = do
 smtpLineParser :: SMTPSessionState -> Parser SMTPCommand
 smtpLineParser session = 
   case (step session) of 
-    StandBy -> cmdLine "HELO" Helo <|> cmdLine "QUIT" Exit
-    Helo -> addressLine "MAIL FROM:" MailFrom
-    MailFrom -> mailRcpt
-    MailRcpt -> mailRcpt <|> cmdLine "DATA" DataStart
+    StandBy -> cmdLine "HELO" Helo <|> exit
+    Helo -> addressLine "MAIL FROM:" MailFrom <|> exit
+    MailFrom -> mailRcpt <|> exit
+    MailRcpt -> mailRcpt <|> cmdLine "DATA" DataStart <|> exit
     DataStart -> dataLine -- TODO: check if DATA is completely empty
     DataLine -> cmdLine "." StandBy <|> dataLine
     where
+      exit = cmdLine "QUIT" Exit
       mailRcpt = addressLine "RCPT TO:" MailRcpt
       mailFrom = addressLine "MAIL FROM:" MailFrom
       dataLine = do 

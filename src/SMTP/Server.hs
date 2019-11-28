@@ -24,7 +24,7 @@ smtpServer socket = do
 
 smtpProcessor :: Socket -> StateT SMTPSessionState IO ()
 smtpProcessor socket = do 
-  msg <- lift $ recv socket 1024
+  msg <- lift $ recv socket 1024 -- TODO: recibir y acumular hasta un \n
 
   unless (S.null msg) $ do
     serverState <- get
@@ -35,7 +35,7 @@ smtpProcessor socket = do
     case parseResult of 
       Left err -> do
         lift $ print err
-        lift $ send socket $ "501 Syntax error - unexpected command " ++ (init message)
+        lift $ send socket $ "501 Error - unexpected command " ++ (init message)
         smtpProcessor socket
 
       Right cmd -> do

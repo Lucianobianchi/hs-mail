@@ -24,14 +24,12 @@ popLineParser session =
   case (step session) of 
     StandBy -> cmdLine "user" User <|> quitOrReset
     User -> cmdLine "pass" Pass <|> quitOrReset
-    LoggedIn -> cmdLine "stat" Stat <|> 
-                cmdLine "list" List <|> 
+    LoggedIn -> cmdLine "stat" Stat <|> cmdLine "list" List <|>  quitOrReset <|>
                 cmdLineIntArg "retr" Retr <|> 
-                cmdLineIntArg "dele" Dele <|> 
-                quitOrReset
+                cmdLineIntArg "dele" Dele
     where 
-      quitParser = cmdLine "quit" Exit
       resetParser = cmdLine "rset" Reset
+      quitParser = cmdLine "quit" Exit
       quitOrReset = quitParser <|> resetParser
 
 
