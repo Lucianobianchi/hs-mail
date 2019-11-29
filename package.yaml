@@ -30,6 +30,7 @@ dependencies:
 - hedis
 - time
 - email-validate
+- hsemail
 
 library:
   source-dirs: src

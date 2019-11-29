@@ -3,18 +3,19 @@ module POP.Parser
 import Types
 import POP.Types
 import Text.ParserCombinators.Parsec
+import Text.Parsec.Rfc2234(caseString)
 import Data.Char
 
 cmdLine :: String -> POPStep -> Parser POPCommand
 cmdLine cmdStr popStep = do
-  cmd <- string cmdStr
+  cmd <- caseString cmdStr
   many (char ' ')
   argument <- manyTill anyChar newline
   return (popStep, argument)
 
 cmdLineIntArg :: String -> POPStep -> Parser POPCommand
 cmdLineIntArg cmdStr popStep = do
-  cmd <- string cmdStr
+  cmd <- caseString cmdStr
   many (char ' ')
   argument <- manyTill digit newline
   return (popStep, argument)
