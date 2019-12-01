@@ -7,6 +7,8 @@ import Control.Monad
 import Control.Monad.Trans
 import Data.ByteString.UTF8 (toString, fromString)
 
+-- TODO: case insensitiveness!!!
+
 readMail :: String -> Mail
 readMail mail = read mail
 

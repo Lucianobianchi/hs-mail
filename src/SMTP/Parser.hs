@@ -28,7 +28,7 @@ smtpLineParser session =
     MailFrom -> mailRcpt <|> exit
     MailRcpt -> mailRcpt <|> cmdLine "data" DataStart <|> exit
     DataStart -> dataLine
-    DataLine -> cmdLine "." StandBy <|> dataLine
+    DataLine -> cmdLine "." DataEnd <|> dataLine
     where
       exit = cmdLine "quit" Exit
       mailRcpt = addressLine "rcpt to:" MailRcpt

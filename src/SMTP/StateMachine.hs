@@ -16,8 +16,6 @@ saveMailInSession s = do
   now <- getCurrentTime
   saveMail Mail{from=mailFrom s, to=mailRcpt s, content=mailData s, sentTime=now}
 
--- TODO: se me está repitiendo código en esto pero es la forma mas concisa que me anduvo.
--- Ver como se puede mejorar. Y encima me tuve que implementar el when no se por que.
 whenS cond m1 m2 = 
   if cond
   then
@@ -63,7 +61,7 @@ processCmd socket session cmd =
     (DataLine, DataLine) -> do
       return SMTPSessionState{step=DataLine, mailRcpt=mailRcpt session, mailFrom=mailFrom session, mailData=(mailData session) ++ "\n" ++ arg}
     
-    (DataLine, StandBy) -> do
+    (DataLine, DataEnd) -> do
       send socket "250 Ok queued"
       saveMailInSession session
       return SMTPSessionState{step=Helo, mailRcpt=[], mailFrom="", mailData=""}

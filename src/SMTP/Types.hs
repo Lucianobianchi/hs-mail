@@ -1,10 +1,10 @@
 module SMTP.Types  
-( SMTPStep(StandBy, Helo, MailFrom, MailRcpt, DataStart, DataLine, Exit), 
+( SMTPStep(StandBy, Helo, MailFrom, MailRcpt, DataStart, DataLine, DataEnd, Exit), 
   SMTPCommand,
   SMTPSessionState(SMTPSessionState, step, mailRcpt, mailFrom, mailData),
 ) where 
 
-data SMTPStep = Helo | MailFrom | MailRcpt | DataStart | DataLine | StandBy | Exit deriving (Show, Read, Eq)
+data SMTPStep = Helo | MailFrom | MailRcpt | DataStart | DataLine | DataEnd | StandBy | Exit deriving (Show, Read, Eq)
 
 data SMTPSessionState = SMTPSessionState { 
   mailFrom :: String, 

@@ -3,6 +3,7 @@ module POP.StateMachine
 
 import System.IO
 import Control.Monad.State
+import Control.Monad (unless)
 import Types
 import POP.Types
 import POP.POPUtils(getStat, getRetr, getList)
@@ -19,21 +20,20 @@ processCmd socket session cmd =
       if (length arg) == 0
       then
         do 
-          send socket "-ERR Please specify a user"
+          sendError socket "-ERR Please specify a user"
           return session
       else
         do 
-          send socket "+OK"
+          sendOk socket ""
           return POPSessionState{step=User, user=arg, pass=""}
     
     (User, Pass) -> do
       -- Any password is valid right now
-      send socket "+OK"
+      sendOk socket ""
       return POPSessionState{step=LoggedIn, user=user session, pass=arg}
     
-      -- TODO: estoy repitiendo codigo fuerte aca
     (LoggedIn, Stat) -> do
-      getMails (user session) (\mails -> send socket $ "+OK " ++ (getStat mails))
+      getMails (user session) (\mails -> sendOk socket (getStat mails))
       return session
     
     (LoggedIn, Retr) -> do
@@ -42,34 +42,38 @@ processCmd socket session cmd =
         if (length mails) >= index -- index starts at 1 in POP
         then
           do
-            send socket $ "+OK " ++ (getRetr mails index)
+            sendOk socket (getRetr mails index)
             return session
         else
           do
-            send socket $ "-ERR no message at index " ++ (show index)
+            sendError socket $ "no message at index " ++ (show index)
             return session)
 
     (LoggedIn, List) -> do
-      getMails (user session) (\mails -> send socket $ "+OK\n" ++ (getList mails))
+      getMails (user session) $ \mails -> do
+        sendOk socket (getStat mails)
+        unless (length mails == 0) (send socket $ getList mails)
       return session
     
     (LoggedIn, Dele) -> do
       let index = read arg
-      deleteMail (user session) (index-1)
-      send socket $ "+OK deleted " ++ (show index)
+      deleteMail (user session) (index - 1)
+      sendOk socket $ "deleted " ++ (show index)
       return session
 
     (_, Reset) -> do
-      send socket "+OK reset session"
+      sendOk socket "reset session"
       return POPSessionState{step=StandBy, user="", pass=""}
 
     (_, Exit) -> do
-      send socket "+OK bye!"
+      sendOk socket "bye!"
       return POPSessionState{step=Exit, user="", pass=""}
 
     (_, _) -> do
-      send socket "-ERR You must log in first!"
+      sendError socket "You must log in first!"
       return session
-      
-      -- TODO: devolver 0 cuando no hay ningun mail en STAT y LIST
-      -- TODO: puedo poner el send socket OK en una funcion en la seccion where del case
+
+    where
+      sendError socket message = send socket ("-ERR " ++ message)
+      sendOk socket "" = send socket "+OK"
+      sendOk socket message = send socket ("+OK " ++ message)

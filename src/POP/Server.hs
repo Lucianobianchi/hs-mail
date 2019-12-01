@@ -20,7 +20,6 @@ import NetworkUtils(send, sendMany)
   
 popServer socket = execStateT (popProcessor socket) POPSessionState{step=StandBy, user="", pass=""}
 
--- TODO: se podría compartir esta función entre SMTP y POP? Sin hacerlo muy confuso
 popProcessor :: Socket -> StateT POPSessionState IO ()
 popProcessor socket = do 
   msg <- lift $ recv socket 1024
