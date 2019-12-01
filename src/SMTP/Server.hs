@@ -22,7 +22,7 @@ smtpServer socket = execStateT (smtpProcessor socket) SMTPSessionState{mailFrom=
 
 smtpProcessor :: Socket -> StateT SMTPSessionState IO ()
 smtpProcessor socket = do 
-  msg <- lift $ recv socket 1024 -- TODO: recibir y acumular hasta un \n
+  msg <- lift $ recv socket 1024
 
   unless (S.null msg) $ do
     serverState <- get

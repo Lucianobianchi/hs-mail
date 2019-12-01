@@ -12,9 +12,7 @@ import Data.ByteString.UTF8 (toString, fromString)
 readMail :: String -> Mail
 readMail mail = read mail
 
--- TODO:
--- handle para errores
--- Parametrizar el connectInfo en vez de usar el default
+-- TODO: handle para errores
 saveMail :: Mail -> IO ()
 saveMail mail = do 
   conn <- connect defaultConnectInfo
