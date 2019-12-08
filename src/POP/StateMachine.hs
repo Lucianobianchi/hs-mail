@@ -8,7 +8,7 @@ import Types
 import POP.Types
 import POP.POPUtils(getStat, getRetr, getList)
 import MailStore
-import NetworkUtils(send)
+import Utils(send)
 import Network.Socket
 
 processCmd :: Socket -> FSM POPSessionState POPCommand
@@ -25,12 +25,12 @@ processCmd socket session cmd =
       else
         do 
           sendOk socket ""
-          return POPSessionState{step=User, user=arg, pass=""}
+          return session {step=User, user=arg}
     
     (User, Pass) -> do
       -- Any password is valid right now
       sendOk socket ""
-      return POPSessionState{step=LoggedIn, user=user session, pass=arg}
+      return session{step=LoggedIn, pass=arg}
     
     (LoggedIn, Stat) -> do
       getMails (user session) (\mails -> sendOk socket (getStat mails))
@@ -63,11 +63,11 @@ processCmd socket session cmd =
 
     (_, Reset) -> do
       sendOk socket "reset session"
-      return POPSessionState{step=StandBy, user="", pass=""}
+      return session {step=StandBy, user="", pass=""}
 
     (_, Exit) -> do
       sendOk socket "bye!"
-      return POPSessionState{step=Exit, user="", pass=""}
+      return session {step=Exit}
 
     (_, _) -> do
       sendError socket "You must log in first!"

@@ -6,7 +6,7 @@ import Control.Monad.State
 import Types
 import SMTP.Types
 import MailStore
-import NetworkUtils(send, isValidEmail)
+import Utils(send, isValidEmail)
 import Network.Socket
 
 import Data.Time.Clock
@@ -34,41 +34,41 @@ processCmd socket session cmd =
   case (step session, nextStep) of 
     (StandBy, Helo) -> do
       send socket "250 Hello, please to meet you"
-      return SMTPSessionState{step=Helo, mailRcpt=[], mailFrom="", mailData=""}
+      return session {step=Helo}
   
     (Helo, MailFrom) -> do
       whenS (not $ isValidEmail arg) (noSuchUserError socket session arg) $ do
         send socket "250 Ok"
-        return SMTPSessionState{step=MailFrom, mailRcpt=[], mailFrom=arg, mailData=""}
+        return session {step=MailFrom, mailFrom=arg}
 
     (MailFrom, MailRcpt) -> do
       whenS (not $ isValidEmail arg) (noSuchUserError socket session arg) $ do
         send socket "250 Ok"
-        return SMTPSessionState{step=MailRcpt, mailRcpt=[arg], mailFrom=mailFrom session, mailData=""}
+        return session {step=MailRcpt, mailRcpt=[arg]}
 
     (MailRcpt, MailRcpt) -> do
       whenS (not $ isValidEmail arg) (noSuchUserError socket session arg) $ do
         send socket "250 Ok"
-        return SMTPSessionState{step=MailRcpt, mailRcpt=(mailRcpt session) ++ [arg], mailFrom=mailFrom session, mailData=""}
+        return session {step=MailRcpt, mailRcpt=(mailRcpt session) ++ [arg]}
   
     (MailRcpt, DataStart) -> do
       send socket "354 End data with <CR><LF>.<CR><LF>"
-      return SMTPSessionState{step=DataStart, mailRcpt=mailRcpt session, mailFrom=mailFrom session, mailData=""}
+      return session {step=DataStart}
   
     (DataStart, DataLine) -> do
-      return SMTPSessionState{step=DataLine, mailRcpt=mailRcpt session, mailFrom=mailFrom session, mailData=arg}
+      return session {step=DataLine, mailData=arg}
     
     (DataLine, DataLine) -> do
-      return SMTPSessionState{step=DataLine, mailRcpt=mailRcpt session, mailFrom=mailFrom session, mailData=(mailData session) ++ "\n" ++ arg}
+      return session {mailData=(mailData session) ++ "\n" ++ arg}
     
     (DataLine, DataEnd) -> do
       send socket "250 Ok queued"
       saveMailInSession session
-      return SMTPSessionState{step=Helo, mailRcpt=[], mailFrom="", mailData=""}
+      return session {step=Helo, mailRcpt=[], mailFrom="", mailData=""}
     
     (_, Exit) -> do
       send socket "Bye!"
-      return SMTPSessionState{step=Exit, mailRcpt=[], mailFrom="", mailData=""}
+      return session {step=Exit, mailRcpt=[], mailFrom="", mailData=""}
     
     (_, _) -> do
       send socket "503 Bad sequence of commands"

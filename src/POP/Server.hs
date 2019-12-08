@@ -16,7 +16,7 @@ import POP.Parser
 import POP.StateMachine
 import Types
 import POP.Types
-import NetworkUtils(send, sendMany)
+import Utils(send, sendMany)
   
 popServer socket = execStateT (popProcessor socket) POPSessionState{step=StandBy, user="", pass=""}
 

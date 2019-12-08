@@ -16,14 +16,14 @@ import SMTP.Parser
 import SMTP.StateMachine
 import Types
 import SMTP.Types
-import NetworkUtils(send, sendMany)
+import Utils(send, sendMany)
   
-smtpServer socket = execStateT (smtpProcessor socket) SMTPSessionState{mailFrom="", mailRcpt=[], mailData="", step=StandBy}
+smtpServer socket = execStateT (smtpProcessor socket) SMTPSessionState{lineBuf="", mailFrom="", mailRcpt=[], mailData="", step=StandBy}
 
 smtpProcessor :: Socket -> StateT SMTPSessionState IO ()
 smtpProcessor socket = do 
   msg <- lift $ recv socket 1024
-
+  
   unless (S.null msg) $ do
     serverState <- get
     let message = toString msg
