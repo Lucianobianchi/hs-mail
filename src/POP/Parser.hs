@@ -10,6 +10,13 @@ cmdLine :: String -> POPStep -> Parser POPCommand
 cmdLine cmdStr popStep = do
   cmd <- caseString cmdStr
   many (char ' ')
+  manyTill anyChar newline
+  return (popStep, argument)
+
+cmdLineArg :: String -> POPStep -> Parser POPCommand
+cmdLineArg cmdStr popStep = do
+  cmd <- caseString cmdStr
+  many1 (char ' ')
   argument <- manyTill anyChar newline
   return (popStep, argument)
 
@@ -17,20 +24,18 @@ cmdLineIntArg :: String -> POPStep -> Parser POPCommand
 cmdLineIntArg cmdStr popStep = do
   cmd <- caseString cmdStr
   many (char ' ')
-  argument <- manyTill digit newline
+  argument <- many1 digit <* newline
   return (popStep, argument)
 
 popLineParser :: POPSessionState -> Parser POPCommand
 popLineParser session = 
   case (step session) of 
-    StandBy -> cmdLine "user" User <|> quitOrReset
-    User -> cmdLine "pass" Pass <|> quitOrReset
-    LoggedIn -> cmdLine "stat" Stat <|> cmdLine "list" List <|>  quitOrReset <|>
+    StandBy -> cmdLineArg "user" User <|> quitParser
+    User -> cmdLineArg "pass" Pass <|> quitParser
+    LoggedIn -> cmdLine "stat" Stat <|> cmdLine "list" List <|>
                 cmdLineIntArg "retr" Retr <|> 
-                cmdLineIntArg "dele" Dele
+                cmdLineIntArg "dele" Dele <|>  quitParser 
     where 
-      resetParser = cmdLine "rset" Reset
       quitParser = cmdLine "quit" Exit
-      quitOrReset = quitParser <|> resetParser
 
 

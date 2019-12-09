@@ -10,6 +10,7 @@ import POP.POPUtils(getStat, getRetr, getList)
 import MailStore
 import Utils(send)
 import Network.Socket
+import Text.Read(readMaybe)
 
 processCmd :: Socket -> FSM POPSessionState POPCommand
 processCmd socket session cmd = 
@@ -39,7 +40,7 @@ processCmd socket session cmd =
     (LoggedIn, Retr) -> do
       let index = read arg
       getMails (user session) (\mails -> do
-        if (length mails) >= index -- index starts at 1 in POP
+        if index > 0 && (length mails) >= index -- index starts at 1 in POP
         then
           do
             sendOk socket (getRetr mails index)
