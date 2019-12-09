@@ -1,5 +1,5 @@
 module Utils 
-(send, sendMany, isValidEmail, buffer) where
+(send, sendMany, isValidEmail) where
 
 import Data.ByteString.UTF8 (fromString)
 import Network.Socket.ByteString (sendAll)

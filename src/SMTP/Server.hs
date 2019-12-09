@@ -18,7 +18,7 @@ import Types
 import SMTP.Types
 import Utils(send, sendMany)
   
-smtpServer socket = execStateT (smtpProcessor socket) SMTPSessionState{lineBuf="", mailFrom="", mailRcpt=[], mailData="", step=StandBy}
+smtpServer socket = execStateT (smtpProcessor socket) SMTPSessionState{mailFrom="", mailRcpt=[], mailData="", step=StandBy}
 
 smtpProcessor :: Socket -> StateT SMTPSessionState IO ()
 smtpProcessor socket = do 
